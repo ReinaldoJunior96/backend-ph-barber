@@ -6,7 +6,7 @@ const authMiddleware = require('../middlewares/Auth')
 
 // Rota para login com middleware 'authorization'
 router.post('/login', (req, res) => userController.login(req, res))
-router.post('/created', (req, res) => userController.create(req, res))
+router.post('/created', (req, res) => userController.create(req,res))
 
 router.get('/i', authMiddleware, (req,res) => userController.dataUser(req,res))
 router.get(

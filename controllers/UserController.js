@@ -1,32 +1,41 @@
 const { User: model, getUser } = require('../models/User')
+const { checkIfEmailExists } = require('../validations/User-validation')
 const jwt = require('jsonwebtoken')
 
 const userController = {
   create: async (req, res) => {
     try {
+      await checkIfEmailExists(req, res)
       const user = await model.create(req.body)
-      const response = await model.create(user)
-
-      res.status(201).json({
-        'mgs': 'User created successfully!',
-        user
-      })
+      if (user) {
+        res.status(201).json({
+          message: 'User created successfully!',
+          user,
+        })
+      } else {
+        res.status(500).json({ message: 'Error creating user' })
+      }
     } catch (error) {
+      console.log(error)
       res.status(500).json({ message: 'Error creating user' })
     }
   },
+
   login: async (req, res) => {
     const user = await model.findOne({ email: req.body.email })
-    console.log(user._id)
-    const secret = process.env.SECRET
-    const token = jwt.sign(
-      {
-        id: user.id
-      },
-      secret
-    )
 
-    res.status(200).json({ mgs: 'usuário logado', token })
+    if (!user) {
+      res.status(500).json({ message: 'Invalid user!' })
+    }
+
+    const secret = process.env.SECRET
+    const token = jwt.sign({ id: user.id }, secret)
+
+    if (!token) {
+      res.status(500).json({ message: 'Error generating token!' })
+    }
+
+    res.status(200).json({ token, user })
   },
   dataUser: async (req, res) => {
     try {

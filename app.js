@@ -23,3 +23,6 @@ app.use("/api", routes);
 app.listen(3000, () => {
   console.log('Servidor online!!');
 });
+
+//apenas para testar
+module.exports = app;
