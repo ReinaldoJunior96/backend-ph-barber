@@ -32,8 +32,17 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MzVkZGZmNWIxOTIwODk2NzZiODdhZCIsImlhdCI6MTY5ODAyOTA2MX0.h0D_o_DwIrJZbGXUhBCje6tKus-2xdxppyaQUNe6P6U
 
 {
-  "date": "2023-10-30T15:30:00",
+  "date": "2023-10-25T15:30:00",
   "service": "corte de cabelo 214"
+}
+
+### Sent DELETE
+DELETE http://localhost:3000/api/appointments/delete
+Content-Type: application/json
+
+{
+"date": "2023-10-25T15:30:00",
+"service": "corte de cabelo 214"
 }
 
 

@@ -1,41 +1,50 @@
 const { Appointment: model } = require('../models/Appointment')
 const { User } = require('../models/User')
+const { checksIfTheDateIsGreaterThanTheCurrentDate } = require('../validations/Appointment-validation')
 const getInfoUser = require('../Utils/getUser')
 
 const appointmentController = {
   create: async (req, res) => {
     try {
+      await checksIfTheDateIsGreaterThanTheCurrentDate(req, res)
+
       const appointment = await
-        model.create({...req.body, user: getInfoUser(req) })
+        model.create({ ...req.body, user: req.body.id ?? getInfoUser(req) })
+
+      if (appointment) {
+        res.status(500).json({ message: 'Error creating appointment' })
+      }
 
       await User.findByIdAndUpdate(
-        getInfoUser(req),
-        { $push: { appointments: appointment._id } },
+        req.body.id ?? getInfoUser(req),
+        {
+          $push:
+            {
+              appointments: appointment._id
+            }
+        },
         { new: true }
-      );
-
-
-      return res.status(201).json({mgs: 'Appointment created successifily'})
+      )
+      return res.status(201).json({ mgs: 'Appointment created successifily' })
 
     } catch (error) {
       console.log(error)
       res.status(500).json({ message: 'Error creating appointment' })
     }
   },
-  deleteAppointment: async (req, res) => {
+  delete: async (req, res) => {
     try {
-      const appointmentId = req.params.appointmentId;
 
-      const deletedAppointment = await model.findByIdAndRemove(appointmentId);
+      const deletedAppointment = await model.findByIdAndRemove(req.body.appointmentId)
 
       if (!deletedAppointment) {
-        return res.status(404).json({ message: 'Compromisso não encontrado' });
+        return res.status(500).json({ message: 'Error... appointment not found!' })
       }
 
-      return res.status(200).json({ message: 'Compromisso excluído com sucesso' });
+      return res.status(200).json({ message: 'Appointment deleted!' })
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: 'Erro ao excluir o compromisso' });
+      console.log(error)
+      res.status(500).json({ message: 'Error... appointment not found!' })
     }
   },
   all: async (req, res) => {
