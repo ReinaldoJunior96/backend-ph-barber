@@ -25,4 +25,4 @@ app.listen(3000, () => {
 });
 
 //apenas para testar
-module.exports = app;
+//module.exports = app;

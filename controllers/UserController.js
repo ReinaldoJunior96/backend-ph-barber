@@ -1,11 +1,14 @@
 const { User: model, getUser } = require('../models/User')
-const { checkIfEmailExists } = require('../validations/User-validation')
 const jwt = require('jsonwebtoken')
 
 const userController = {
   create: async (req, res) => {
     try {
-      await checkIfEmailExists(req, res)
+      const email = await model.findOne({ email: req.body.email })
+      if (email) {
+        return res.status(500).json({ message: 'E-mail already exists' })
+      }
+
       const user = await model.create(req.body)
       if (user) {
         res.status(201).json({
@@ -21,6 +24,7 @@ const userController = {
     }
   },
   login: async (req, res) => {
+    console.log(req.body)
     const user = await model.findOne({ email: req.body.email })
     if (!user) {
       return res.status(500).json({ message: 'Invalid user!' })

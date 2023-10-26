@@ -1,19 +1,13 @@
-const router = require("express").Router()
+const router = require('express').Router()
 const appointmentController = require('../controllers/AppointmentController')
+const authMiddleware = require('../middlewares/Auth')
 
 router
-  .route("/created")
-  .post((req, res) => appointmentController.create(req, res));
+  .post('/created', authMiddleware, (req, res) => appointmentController.create(req, res))
 
 router
-  .route("/delete")
-  .delete((req, res) => appointmentController.delete(req, res));
+  .delete('/delete/:id', authMiddleware, (req, res) => appointmentController.delete(req, res))
 router
-  .route("/all")
-  .get((req, res) => appointmentController.all(req, res));
+  .get('/all', authMiddleware, (req, res) => appointmentController.all(req, res))
 
-
-
-
-
-module.exports = router;
+module.exports = router

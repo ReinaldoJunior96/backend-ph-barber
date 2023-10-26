@@ -2,51 +2,59 @@ const { Appointment: model } = require('../models/Appointment')
 const { User } = require('../models/User')
 const { checksIfTheDateIsGreaterThanTheCurrentDate } = require('../validations/Appointment-validation')
 const getInfoUser = require('../Utils/getUser')
+const moment = require('moment/moment')
 
 const appointmentController = {
   create: async (req, res) => {
     try {
-      await checksIfTheDateIsGreaterThanTheCurrentDate(req, res)
+      console.log(req.body.dateTime)
+      const requestedDate = moment(req.body.dateTime)
 
-      const appointment = await
-        model.create({ ...req.body, user: req.body.id ?? getInfoUser(req) })
+      if (requestedDate.isBefore(moment())) {
+        return res.status(400).json({
+          message: 'Date invalid!'
+        })
+      }
 
-      if (appointment) {
-        res.status(500).json({ message: 'Error creating appointment' })
+      const appointment = await model.create({ ...req.body, user: req.body.id ?? getInfoUser(req) })
+
+      if (!appointment) {
+        return res.status(500).json({ message: 'Error creating appointment' })
       }
 
       await User.findByIdAndUpdate(
         req.body.id ?? getInfoUser(req),
         {
-          $push:
-            {
-              appointments: appointment._id
-            }
+          $push: {
+            appointments: appointment._id
+          }
         },
         { new: true }
       )
-      return res.status(201).json({ mgs: 'Appointment created successifily' })
+
+      return res.status(201).json({ message: 'Appointment created successfully' })
 
     } catch (error) {
-      console.log(error)
-      res.status(500).json({ message: 'Error creating appointment' })
+      console.error(error)
+      return res.status(500).json({ message: 'Error creating appointment' })
     }
   },
+
   delete: async (req, res) => {
     try {
-
-      const deletedAppointment = await model.findByIdAndRemove(req.body.appointmentId)
+      const deletedAppointment = await model.findByIdAndRemove(req.params.id)
 
       if (!deletedAppointment) {
-        return res.status(500).json({ message: 'Error... appointment not found!' })
+        return res.status(404).json({ message: 'Appointment not found' })
       }
 
-      return res.status(200).json({ message: 'Appointment deleted!' })
+      return res.status(200).json({ message: 'Appointment deleted' })
     } catch (error) {
-      console.log(error)
-      res.status(500).json({ message: 'Error... appointment not found!' })
+      console.error(error)
+      return res.status(500).json({ message: 'Internal Server Error' })
     }
   },
+
   all: async (req, res) => {
     try {
       const appointments = await model.find()
