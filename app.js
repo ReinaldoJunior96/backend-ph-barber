@@ -20,8 +20,8 @@ conn().then(() => {
 const routes = require('./routes/router');
 app.use("/api", routes);
 
-app.listen(3000, () => {
-  console.log('Servidor online!!');
+app.listen(9876, () => {
+  console.log('Servidor online!! na porta 9876');
 });
 
 //apenas para testar

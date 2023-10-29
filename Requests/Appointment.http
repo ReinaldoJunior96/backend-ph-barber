@@ -12,7 +12,8 @@ POST http://localhost:3000/api/users/created
 Content-Type: application/json
 
 {
-  "email": "portugualdad@gmail.com",
+  "name": "nameteste",
+  "email": "testename@gmail.com",
   "password": "123"
 }
 
